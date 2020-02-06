@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+package things;
+
+import "google/protobuf/empty.proto";
+
+message Thing {
+  string thing = 1;
+  int32 votes = 2;
+}
+
+message ListThingsResponse {
+  repeated Thing things = 1;
+}
+
+service Voting {
+  rpc ListThings(google.protobuf.Empty) returns (ListThingsResponse) {
+  }
+  rpc AddThing(Thing) returns (Thing) {
+  }
+  rpc UpVoteThing(Thing) returns (Thing) {
+  }
+  rpc DownVoteThing(Thing) returns (Thing) {
+  }
+}
