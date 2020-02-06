@@ -2,7 +2,10 @@ syntax = "proto3";
 
 package things;
 
+option go_package = "github.com/therealwardo/grpc-api/gateway/proto";
+
 import "google/protobuf/empty.proto";
+import "google/api/annotations.proto";
 
 message Thing {
   string thing = 1;
@@ -15,11 +18,24 @@ message ListThingsResponse {
 
 service Voting {
   rpc ListThings(google.protobuf.Empty) returns (ListThingsResponse) {
+    option (google.api.http).get = "/v1/things";
   }
   rpc AddThing(Thing) returns (Thing) {
+    option (google.api.http) = {
+      post: "/v1/things/{thing}"
+      body: "*"
+    };
   }
   rpc UpVoteThing(Thing) returns (Thing) {
+    option (google.api.http) = {
+      post: "/v1/things/{thing}/up"
+      body: "*"
+    };
   }
   rpc DownVoteThing(Thing) returns (Thing) {
+    option (google.api.http) = {
+      post: "/v1/things/{thing}/down"
+      body: "*"
+    };
   }
 }

@@ -1,0 +1,21 @@
+version: '3'
+services:
+  grpc-server:
+    image: node:12
+    ports:
+      - "50051:50051"
+    volumes:
+      - .:/data
+    command:
+      - node
+      - /data/server.js
+    
+  grpc-gateway:
+    build: .
+    command:
+      - ./gateway
+      - -grpc-server-endpoint=grpc-server:50051
+    links:
+      - grpc-server
+    ports:
+      - "8081:8081"
