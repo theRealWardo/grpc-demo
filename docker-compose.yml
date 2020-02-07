@@ -1,4 +1,4 @@
-version: '3'
+version: '3.4'
 services:
   grpc-server:
     image: node:12
@@ -11,7 +11,9 @@ services:
       - /data/server.js
     
   grpc-gateway:
-    build: .
+    build:
+      context: .
+      target: gateway
     command:
       - ./gateway
       - -grpc-server-endpoint=grpc-server:50051
@@ -19,3 +21,17 @@ services:
       - grpc-server
     ports:
       - "8081:8081"
+    
+  swagger-json:
+    build:
+      context: .
+      target: static
+    links:
+      - grpc-gateway
+    ports:
+      - "8080:80"
+    
+  swagger-ui:
+    image: swaggerapi/swagger-ui
+    ports:
+      - "8888:8080"

@@ -1,0 +1,50 @@
+syntax = "proto3";
+
+package things;
+
+option go_package = "github.com/therealwardo/grpc-api/gateway/proto";
+
+import "google/protobuf/empty.proto";
+import "google/api/annotations.proto";
+import "protoc-gen-swagger/options/annotations.proto";
+
+option (grpc.gateway.protoc_gen_swagger.options.openapiv2_swagger) = {
+	info: {
+		title: "A Basic API of Things";
+		version: "1.0";
+	};
+	schemes: HTTP;
+};
+
+message Thing {
+  string thing = 1;
+  int32 votes = 2;
+}
+
+message ListThingsResponse {
+  repeated Thing things = 1;
+}
+
+service Voting {
+  rpc ListThings(google.protobuf.Empty) returns (ListThingsResponse) {
+    option (google.api.http).get = "/v1/things";
+  }
+  rpc AddThing(Thing) returns (Thing) {
+    option (google.api.http) = {
+      post: "/v1/things/{thing}"
+      body: "*"
+    };
+  }
+  rpc UpVoteThing(Thing) returns (Thing) {
+    option (google.api.http) = {
+      post: "/v1/things/{thing}/up"
+      body: "*"
+    };
+  }
+  rpc DownVoteThing(Thing) returns (Thing) {
+    option (google.api.http) = {
+      post: "/v1/things/{thing}/down"
+      body: "*"
+    };
+  }
+}

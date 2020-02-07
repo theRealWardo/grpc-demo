@@ -1,4 +1,4 @@
-FROM golang:1.13
+FROM golang:1.13 AS gateway
 
 RUN apt-get update && apt-get install -y unzip
 
@@ -23,6 +23,7 @@ WORKDIR /go/src
 RUN protoc -I/usr/local/include -I. \
   -I$GOPATH/src \
   -I$GOPATH/src/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis \
+  -I$GOPATH/src/github.com/grpc-ecosystem/grpc-gateway \
   --go_out=plugins=grpc:. \
   github.com/therealwardo/grpc-api/proto/voting.proto
 
@@ -31,11 +32,26 @@ RUN protoc -I/usr/local/include -I. \
 RUN protoc -I/usr/local/include -I. \
   -I$GOPATH/src \
   -I$GOPATH/src/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis \
+  -I$GOPATH/src/github.com/grpc-ecosystem/grpc-gateway \
   --grpc-gateway_out=logtostderr=true:. \
   github.com/therealwardo/grpc-api/proto/voting.proto
+
+# Generate the Swagger.
+RUN protoc -I/usr/local/include -I. \
+  -I$GOPATH/src \
+  -I$GOPATH/src/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis \
+  -I$GOPATH/src/github.com/grpc-ecosystem/grpc-gateway \
+  --swagger_out=logtostderr=true:. \
+  github.com/therealwardo/grpc-api/proto/voting_swag.proto
 
 # Compile + Run
 WORKDIR /go/src/github.com/therealwardo/grpc-api/gateway
 RUN go mod init && \
   go mod tidy && \
   go build
+
+
+# Make a simple serving image.
+FROM nginx:stable AS static
+COPY --from=gateway /go/src/github.com/therealwardo/grpc-api/proto/voting_swag.swagger.json /usr/share/nginx/html/voting.swagger.json
+COPY nginx.conf /etc/nginx/conf.d/default.conf
