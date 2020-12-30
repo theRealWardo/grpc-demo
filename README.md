@@ -1,4 +1,4 @@
-This is a hacked together gRPC demo app that I used for a talk. The talk demo builds up 3 parts, split into 3 branches:
+This is a hacked together gRPC demo app that I used for a talk. The talk includes a 3 part demo each part builds on the previous. The parts are split into 3 branches:
 
 1. `master` includes a basic gRPC server.
 2. The `with-gateway` branch ([view diff](https://github.com/theRealWardo/grpc-demo/compare/with-gateway)) adds a JSON API gateway to the gRPC server.
